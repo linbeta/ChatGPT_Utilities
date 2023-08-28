@@ -4,7 +4,10 @@ import json
 from dotenv import dotenv_values
 import ast
 
-app = Flask(__name__)
+app = Flask(__name__,
+    static_url_path="",
+    static_folder="static",
+)
 
 
 @app.route("/")
