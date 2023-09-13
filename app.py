@@ -22,28 +22,24 @@ def prompt_to_palette():
     openai.api_key = config["OPENAI_API_KEY"]
     # prompt engineering part
     user_input = request.form.get("query")
-    prompt = f"""
-        You are a color palette generating assistant who will generate 2 to 8 hexadecimal color code list.
-        You will generate colors based on the descriptions and scenario that user provided, and answer colors in python list following below format:
 
-        Q: 4 colors of Google brand
-        A: [#4285F4', '#EA4335', '#FBBC05', '#34A853']
+    resp = openai.ChatCompletion.create(
+        model = "gpt-3.5-turbo",
+        messages = [
+            {"role": "system", "content": "You are a color palette generating assistant who will generate 2 to 8 hexadecimal color code list. You will generate colors based on the descriptions and scenario that user provided, and answer colors in python list following below format:"},
+            {"role": "user", "content": "4 colors of Google brand"},
+            {"role": "assistant", "content": "[#4285F4', '#EA4335', '#FBBC05', '#34A853']"},
+            {"role": "user", "content": "desert and sand in summer"},
+            {"role": "assistant", "content": "['#8D5524', '#C68642', '#E0AC69', '#F1C27D', '#FFDBAC']"},
+            {"role": "user", "content": user_input},
 
-        Q: desert and sand in summer
-        A: ['#8D5524', '#C68642', '#E0AC69', '#F1C27D', '#FFDBAC']
-
-        Q: {user_input}
-        A:
-    """
-    resp = openai.Completion.create(
-        model = "text-davinci-003",
-        prompt = prompt,
+        ],
         max_tokens = 300
     )
-    color_list = ast.literal_eval(resp["choices"][0]["text"].strip())
+    color_list = ast.literal_eval(resp["choices"][0]["message"]["content"].strip())
     return color_list
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    app.debug = False
+    app.run(host="0.0.0.0", port=8000)

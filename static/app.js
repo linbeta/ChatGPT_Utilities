@@ -9,22 +9,7 @@ form.addEventListener("submit", function(event) {
         type: 'POST',
         data: {'query': inputText},
         success: function(response) {
-            const container = document.querySelector(".container");
-            container.innerHTML = "";
-            const colors = response;
-            for (const color of colors) {
-                console.log(color);
-                const div = document.createElement("div");
-                const span = document.createElement("span");
-                div.style.backgroundColor = color;
-                div.style.width = `calc(100% / ${colors.length})`;
-                div.classList.add("color-palette");
-                div.innerHTML= `<span class="color-code-span">${color.toUpperCase()}</span>`;
-                div.addEventListener("click", () => {
-                    navigator.clipboard.writeText(color);
-                });
-                container.appendChild(div);
-            };
+            generatePalette(response);
         },
         error: function(error) {
             console.log(error); 
@@ -32,3 +17,22 @@ form.addEventListener("submit", function(event) {
     });
 
 });
+
+function generatePalette(responseArray) {
+    const container = document.querySelector(".container");
+    container.innerHTML = "";
+    const colors = responseArray;
+    for (const color of colors) {
+        console.log(color);
+        const div = document.createElement("div");
+        const span = document.createElement("span");
+        div.style.backgroundColor = color;
+        div.style.width = `calc(100% / ${colors.length})`;
+        div.classList.add("color-palette");
+        div.innerHTML= `<span class="color-code-span">${color.toUpperCase()}</span>`;
+        div.addEventListener("click", () => {
+            navigator.clipboard.writeText(color);
+        });
+        container.appendChild(div);
+    };
+};
