@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import openai
 import json
 from dotenv import dotenv_values
 import ast
+
+config = dotenv_values(".env")
+openai.api_key = config["OPENAI_API_KEY"]
 
 app = Flask(__name__,
     static_url_path="",
@@ -14,12 +17,9 @@ app = Flask(__name__,
 def index():
     return render_template('index.html')
 
+
 @app.route("/palette", methods=["POST"])
 def prompt_to_palette():
-    # app.logger.info("Prompting to palette")
-    # app.logger.info(request.form.get("query"))
-    config = dotenv_values(".env")
-    openai.api_key = config["OPENAI_API_KEY"]
     # prompt engineering part
     user_input = request.form.get("query")
 
@@ -41,5 +41,5 @@ def prompt_to_palette():
 
 
 if __name__ == "__main__":
-    app.debug = False
+    app.debug = True
     app.run(host="0.0.0.0", port=8000)
