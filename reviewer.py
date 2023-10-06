@@ -1,9 +1,7 @@
+import argparse
+from dotenv import load_dotenv
 import openai
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 PROMPT = """
 You will recieve a file's contents as text.
@@ -13,12 +11,7 @@ Be kind and constructive.
 For each suggested change, include line numbers to which your are referring.
 """
 
-filecontent = """
-def a_function(x, y):
-    return x ** y + x * y
-"""
-
-def code_review(file_path, model_name="gpt-3.5-turbo"):
+def code_review(file_path: str, model_name: str):
     with open(file_path, 'r') as f:
         content = f.read()
     reviews = make_code_review_request(content, model_name)
@@ -26,9 +19,10 @@ def code_review(file_path, model_name="gpt-3.5-turbo"):
 
 
 def make_code_review_request(filecontent: str, model_name):
+    print(model_name)
     messages = [
         {"role": "system", "content": PROMPT},
-        {"role": "user", "content": f"Code review the following file: {filecontent}"},
+        {"role": "user", "content": f"Code review the following file:\n{filecontent}"},
     ]
 
     resp = openai.ChatCompletion.create(
@@ -38,6 +32,15 @@ def make_code_review_request(filecontent: str, model_name):
 
     return resp["choices"][0]["message"]["content"]
 
+def main():
+    parser = argparse.ArgumentParser(description="Code review the file with the path provided, default using gpt-3.5-turbo")
+    parser.add_argument("file")
+    parser.add_argument("--model", default="gpt-3.5-turbo")
+    args = parser.parse_args()
+    code_review(args.file, args.model)
+
 
 if __name__ == "__main__":
-    code_review("app.py", "gpt-4")
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    main()
