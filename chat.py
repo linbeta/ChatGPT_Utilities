@@ -21,9 +21,6 @@ initial_system_prompt = """
 全部對話內容的重點整理
 """
 
-summary = ""
-
-
 
 def dialog(user_prompt: str, system_msg, model_name="gpt-4"):
     messages = [
@@ -60,11 +57,29 @@ def save_result_markdown(context, summary):
 
 def main():
     # TODO: 寫可以持對對話的loop機制，累計tokens、並可以儲存最後的重點。
-    # while True:
-    system_prompt = initial_system_prompt + summary
-    user_input = input("Start Dialog: \n")
-    response, usage = dialog(user_input, system_prompt, "gpt-4")
-    print(response, "\n------\n", usage)
+    total_usage = 0
+    summary = ""
+    assistant_answer = ""
+    while True:
+        system_prompt = initial_system_prompt + summary
+        user_input = input("YOU: ")
+        if user_input == "exit":
+            break
+
+        response, usage = dialog(user_input, system_prompt, "gpt-4")
+        try:
+            dialog_summary = response.split("[Summary in Markdown]")[1]
+            assistant_answer = response.split("[對話]")[1].split("[Summary in Markdown]")[0]
+        except Exception as e:
+            print(e)
+            print(f"chatGPT回覆的內容長這樣：\n{response}")
+            dialog_summary = ""
+
+        summary += dialog_summary
+        total_usage += usage
+        print(f"ASSISTANT: {assistant_answer}", "\n--------------\n")
+        print(f"Summary: {dialog_summary}")
+        print(f"Total usage: {total_usage}\n")
 
 
 
